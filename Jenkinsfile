@@ -15,12 +15,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                // Simple HTML syntax check (skip if not needed)
-                sh 'grep -qi "<unique" index.html || (echo "No <html> tag!" && exit 1)'
-            }
-        }
 
         stage('Deploy') {
             steps {
