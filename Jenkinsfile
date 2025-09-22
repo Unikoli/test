@@ -16,9 +16,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building the project..."
-		sh """
-			ssh ${DEPLOY_SERVER} "ls -la ${APP_DIR}"
-		"""
+		 sshagent(credentials: ['server']) {
+                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} 'ls -la ${APP_DIR}'"
             }
         }
 
