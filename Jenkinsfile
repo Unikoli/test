@@ -2,58 +2,44 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_USER = 'root'                  // or a sudo user
-        DEPLOY_HOST = '192.168.30.53'
-        APP_PATH    = '/var/www/html'
-        SITE_NAME   = 'htmlsite'
+        DEPLOY_SERVER = "root@192.168.30.53"
+        APP_DIR = "/var/www/html"
+        GIT_REPO = "git@github.com:Unikoli/test.git"
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: "${GIT_REPO}"
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'echo "Build stage: nothing to compile for plain HTML"'
+                echo "Building the project..."
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running tests..."
             }
         }
 
         stage('Deploy') {
             steps {
-                sshagent (credentials: ['server']) {
-			sh "rsync -avz --delete ./ root@192.168.30.53:/var/www/html/"
-                }
-            }
-        }
-
-        stage('Configure Nginx') {
-            steps {
-                sshagent (credentials: ['server']) {
-                    sh """
-                        ssh $DEPLOY_USER@$DEPLOY_HOST '
-                            cat > /etc/nginx/conf.d/$SITE_NAME <<EOF
-server {
-    listen 80;
-    server_name _;
-    root $APP_PATH;
-    index index.html;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
-
-                            ln -sf /etc/nginx/conf.d/$SITE_NAME /etc/nginx/conf.d/$SITE_NAME
-                            nginx -t
-                            systemctl reload nginx
-                        '
-                    """
-                }
+                echo "Deploying to Webserver..."
             }
         }
     }
 
     post {
-        success { echo "✅ Site deployed and Nginx configured successfully." }
-        failure { echo "❌ Deployment or configuration failed. Check logs." }
+        success {
+            echo "Deployment Successful ✅"
+        }
+        failure {
+            echo "Deployment Failed ❌"
+        }
     }
 }
 
