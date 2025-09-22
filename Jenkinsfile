@@ -19,6 +19,7 @@ pipeline {
 		 sshagent(credentials: ['server']) {
                     sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} 'ls -la ${APP_DIR}'"
             }
+	}
         }
 
         stage('Test') {
