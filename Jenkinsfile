@@ -52,7 +52,6 @@ server {
 }
 EOF
 
-                            ln -sf /etc/nginx/conf.d/$SITE_NAME /etc/nginx/conf.d/$SITE_NAME
                             nginx -t
                             systemctl reload nginx
                         '
