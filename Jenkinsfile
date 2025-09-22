@@ -19,8 +19,6 @@ pipeline {
             steps {
                 sshagent (credentials: ['server']) {
                     sh """
-                        # Create target directory
-                        ssh $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $APP_PATH"
 
                         # Sync HTML files
                         rsync -avz --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/
