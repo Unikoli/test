@@ -18,11 +18,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent (credentials: ['server']) {
-                    sh """
-
-                        # Sync HTML files
-                        rsync -avz --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/
-                    """
+			sh "rsync -avz --delete ./ root@192.168.30.53:/var/www/html/"
                 }
             }
         }
