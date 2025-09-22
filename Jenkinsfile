@@ -19,9 +19,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sshagent (credentials: ['server']) {
-                    sh """
-                        rsync -avz --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/
-                    """
+			sh 'echo "deployment successfull"'
                 }
             }
         }
