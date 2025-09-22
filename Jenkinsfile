@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEPLOY_USER = 'root'                  // or a sudo user
         DEPLOY_HOST = '192.168.30.53'
-        APP_PATH    = '/var/www/htmlsite'
+        APP_PATH    = '/var/www/html/htmlsite'
         SITE_NAME   = 'htmlsite'
     }
 
