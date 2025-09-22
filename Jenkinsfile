@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-	USER = "root"
         DEPLOY_SERVER = "root@192.168.30.53"
         APP_DIR = "/var/www/html"
     }
@@ -18,7 +17,7 @@ pipeline {
             steps {
                 echo "Building the project..."
 		sh """
-			ssh ${USER}@${DEPLOY_SERVER} "ls -la ${APP_DIR}"
+			ssh ${DEPLOY_SERVER} "ls -la ${APP_DIR}"
 		"""
             }
         }
