@@ -17,7 +17,8 @@ pipeline {
             steps {
                 echo "Building the project..."
 		sh """
-			echo 'hello builders'
+			ssh USER@DEPLOY_SERVER
+			ls -la
 		"""
             }
         }
