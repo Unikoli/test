@@ -10,6 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
 		git changelog: false, poll: false, url: 'https://github.com/Unikoli/test.git'
+		}
         }
 
         stage('Build') {
