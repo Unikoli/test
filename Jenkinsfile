@@ -16,6 +16,9 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building the project..."
+		sh """
+			echo 'hello builders'
+		"""
             }
         }
 
