@@ -2,46 +2,69 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_SERVER = "root@192.168.30.53"
-        APP_DIR = "/var/www/html"
+        DEPLOY_USER = 'root'                  // or a sudo user
+        DEPLOY_HOST = '192.168.30.53'
+        APP_PATH    = '/var/www/htmlsite'
+        SITE_NAME   = 'htmlsite'
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-		git changelog: false, poll: false, url: 'https://github.com/Unikoli/test.git'
-		}
-        }
-
+	stage('Git checkout') {
+	steps {
+	git changelog: false, poll: false, url: 'https://github.com/Unikoli/test.git'
+}
+}
         stage('Build') {
             steps {
-                echo "Building the project..."
-		 sshagent(credentials: ['server']) {
-                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} 'ls -la ${APP_DIR}'"
-            }
-	}
-        }
-
-        stage('Test') {
-            steps {
-                echo "Running tests..."
+                sh 'echo "Building ......."'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deploying to Webserver..."
+                sshagent (credentials: ['server']) {
+                    sh """
+                        # Create target directory
+                        ssh $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $APP_PATH"
+
+                        # Sync HTML files
+                        rsync -avz --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$APP_PATH/
+                    """
+                }
+            }
+        }
+
+        stage('Configure Nginx') {
+            steps {
+                sshagent (credentials: ['server']) {
+                    sh """
+                        ssh $DEPLOY_USER@$DEPLOY_HOST '
+                            cat > /etc/nginx/conf.d/$SITE_NAME <<EOF
+server {
+    listen 80;
+    server_name 192.168.30.53;
+    root $APP_PATH;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOF
+
+                            ln -sf /etc/nginx/conf.d/$SITE_NAME /etc/nginx/conf.d/$SITE_NAME
+                            nginx -t
+                            systemctl reload nginx
+                        '
+                    """
+                }
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment Successful ✅"
-        }
-        failure {
-            echo "Deployment Failed ❌"
-        }
+        success { echo "✅ Site deployed and Nginx configured successfully." }
+        failure { echo "❌ Deployment or configuration failed. Check logs." }
     }
 }
 
